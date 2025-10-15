@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrossGolf Tournament - Road Book</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #4caf50;
+            --text-light: #f5f5f5;
+            --text-dark: #333;
+            --background: #f8f9fa;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            height: 3px;
+            width: 25px;
+            background: var(--text-light);
+            margin-bottom: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('https://images.unsplash.com/photo-1535131749006-b7f58c99034b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-light);
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .holes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .hole-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .hole-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .hole-header {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hole-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .hole-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .hole-content {
+            padding: 1.5rem;
+        }
+
+        .hole-description {
+            margin-bottom: 1.5rem;
+            color: #555;
+            white-space: pre-line;
+        }
+
+        .images-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .image-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        .hole-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .image-wrapper:hover .hole-image {
+            transform: scale(1.05);
+        }
+
+        .image-caption {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .hole-details {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .hole-details.active {
+            display: block;
+        }
+
+        .details-content {
+            max-width: 900px;
+            margin: 2rem auto;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        .details-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .details-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        footer {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--primary-dark);
+                padding: 1rem 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                margin: 0;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 0.8rem 2rem;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hamburger.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -6px);
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .holes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .details-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Krosser Karl IX</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#holes">Alle Bahnen</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <h1>Krosser Karl IX</h1>
+        <p>Roadbook des Crossgolf Turniers Krosser Karl IX</p>
+    </section>
+
+    <div class="container" id="holes">
+        <h2>Turnier Bahnen</h2>
+        <p>Wähle auf eine beliebige Bahn aus, um detaillierte Informationen und Bilder anzuzeigen</p>
+
+        <div class="holes-grid" id="holes-container">
+            <!-- Hole cards will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Hole Details Modal -->
+    <div class="hole-details" id="hole-details">
+        <div class="details-content">
+            <button class="close-btn">&times;</button>
+            <div class="hole-header">
+                <span class="hole-number" id="detail-hole-number">Bahn 1</span>
+                <h2 class="hole-title" id="detail-hole-title">Balls on Fire</h2>
+            </div>
+            <p class="hole-description" id="detail-hole-description">
+                <!-- Description will be inserted here by JavaScript -->
+            </p>
+            <div class="details-images" id="detail-images">
+                <!-- Images will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>CrossGolf Tournament Road Book &copy; 2023</p>
+            <p>Alle Bahnendetails können je nach Wetterbedingungen Änderungen unterliegen</p>
+        </div>
+    </footer>
+
+    <script>
+        // Hole data - single source of truth
+        const holeData = {
+            1: {
+                title: "Balls on Fire",
+                description: "Spielmodus: Individuell\n\nDer Ball muss rechts um die Halle herumgespielt werden. Dort ist ein Hydrant, den es zu treffen gilt.",
+                images: [
+                    { src: "img/bahn01_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn01_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            2: {
+                title: "Rampensau",
+                description: "Spielmodus: Sramble\n\nVon der Rampe muss der Ball die Straße hoch gespielt werden. Hinter der rechten Halle ist ein Streusalzbehälter. Dieser muss getroffen werden. Bleibt er Ball drin liegen -1",
+                images: [
+                    { src: "img/bahn02_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn02_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            3: {
+                title: "VAR: Das Tor zählt nicht!",
+                description: "Spielmodus: Individuell\n\nDie Halle muss einmal bis zum Ende gespielt werden und der Ball MUSS durch die kleine Tür gespielt werden (die Rolltore zählen nicht).  Hinter der Tür ist rechts das Ziel. Der Ball muss drinnen liegen bleiben.",
+                images: [
+                    { src: "img/bahn03_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn03_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            4: {
+                title: "Hintertürchen",
+                description: "Spielmodus: Scramble\n\nDer Ball muss durch die markierte Türe von hinten in den Raum links neben dem Start gespielt werden. Der Zielbereich ist hinter der „Fußleiste“. Der Ball darf NICHT auf die Leiste hoch oder in den Zielbereich dahinter bessergelegt werden.",
+                images: [
+                    { src: "img/bahn04_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn04_uebersicht_ziel.jpg", caption: "Ziel" },
+                    { src: "img/bahn04_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            5: {
+                title: "Doppel Dog Leck mich am Arsch",
+                description: "Spielmodus: Scramble\n\nVom Start muss der Ball rechts ums Eck gespielt werden. Treffen des Ziels reicht. Liegt er im Ziel gibt’s -1 (Die Halle mit den Möbeln ist AUS!)",
+                images: [
+                    { src: "img/bahn05_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn05_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            6: {
+                title: "Hallensprung",
+                description: "Spielmodus: Scramble\n\nVom Start geht's in die Parallelhalle. Dort an der „Ausgangstüre“ ist der Zielbereich. Der Ball muss hinter der Schwelle liegen bleiben.",
+                images: [
+                    { src: "img/bahn06_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn06_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            7: {
+                title: "Von hier an bergab!",
+                description: "Spielmodus: Scramble\n\nVom Start geht’s die Straße entlang und hinter der Kurve ist ein Aussenkellertreppe zu einer Türe. Der Ball muss auf dem untersten Podest liegen.",
+                images: [
+                    { src: "img/bahn07_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn07_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            8: {
+                title: "Conti Carl Allee",
+                description: "Spielmodus: Individuell\n\nVom Start geht bis zur vor den Tunnel. Rechts ist eine Platte. Der Ball muss in der auf der Fläche liegen bleiben.",
+                images: [
+                    { src: "img/bahn08_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn08_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            9: {
+                title: "Tunnel of Love",
+                description: "Spielmodus: Scramble\n\nIn der Nähe des Einganstors ist der Start und der Ball muss durch den Tunnel gespielt werden. Dahinter links um die Ecke und auf der rechten Seite steht eine Bank. Die komplette Bank ist das Ziel.",
+                images: [
+                    { src: "img/bahn09_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn09_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            10: {
+                title: "Zicke Zacke Golf ist kacke",
+                description: "Spielmodus: Scramble\n\nVom Start geht's Richtung Halleneingang. Dort ist das Ziel. Es muss getroffen werden.",
+                images: [
+                    { src: "img/bahn10_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn10_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            11: {
+                title: "Karriereleiter",
+                description: "Spielmodus: Scramble\n\nVom Start geht es halblinks hinter die große „Säule“ auf deren Rückseite Türen sind. Die untere Türe gilt als getroffen, die obere linke Tür als -1",
+                images: [
+                    { src: "img/bahn11_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn11_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            12: {
+                title: "Stilles Örtchen",
+                description: "Spielmodus: Scramble\n\nAm Ende der Halle geht es einmal quer von links nach rechts. In dem „Häuschen“ ist die Zielzone die getroffen werden muss. Der Ball muss auf der Fläche liegen bleiben.",
+                images: [
+                    { src: "img/bahn12_start.jpg", caption: "Abschlag" },
+                    { src: "img/bahn12_ziel.jpg", caption: "Ziel" }
+                ]
+            },
+            13: {
+                title: "Flipper",
+                description: "Spielmodus: Individuell\n\n3 mal abschlagen. Das getroffene Ziel mit der niedrigsten Wertung wird als Score eingetragen.",
+                images: [
+                    { src: "img/bahn13.jpg", caption: "Abschlag" }
+                ]
+            }
+            // Additional holes would be defined here
+        };
+
+        // Mobile navigation toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Generate hole cards from holeData
+        const holesContainer = document.getElementById('holes-container');
+
+        Object.keys(holeData).forEach(holeNumber => {
+            const hole = holeData[holeNumber];
+            const holeCard = document.createElement('div');
+            holeCard.className = 'hole-card';
+            holeCard.setAttribute('data-hole', holeNumber);
+
+            holeCard.innerHTML = `
+                <div class="hole-header">
+                    <span class="hole-number">Bahn ${holeNumber}</span>
+                    <h3 class="hole-title">${hole.title}</h3>
+                </div>
+                <div class="hole-content">
+                    <p class="hole-description">${hole.description.split('\n')[0]}</p>
+                    <div class="images-container">
+                        <div class="image-wrapper">
+                            <img src="${hole.images[0].src}" alt="${hole.images[0].caption}" class="hole-image">
+                            <p class="image-caption">${hole.images[0].caption}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            holesContainer.appendChild(holeCard);
+        });
+
+        // Hole details functionality
+        const holeCards = document.querySelectorAll('.hole-card');
+        const holeDetails = document.getElementById('hole-details');
+        const closeBtn = document.querySelector('.close-btn');
+
+        // Open hole details when a hole card is clicked
+        holeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const holeNumber = card.getAttribute('data-hole');
+                const hole = holeData[holeNumber];
+
+                if (hole) {
+                    document.getElementById('detail-hole-number').textContent = `Bahn ${holeNumber}`;
+                    document.getElementById('detail-hole-title').textContent = hole.title;
+                    document.getElementById('detail-hole-description').textContent = hole.description;
+
+                    const imagesContainer = document.getElementById('detail-images');
+                    imagesContainer.innerHTML = '';
+
+                    hole.images.forEach(image => {
+                        const imageWrapper = document.createElement('div');
+                        imageWrapper.className = 'image-wrapper';
+
+                        const img = document.createElement('img');
+                        img.src = image.src;
+                        img.alt = image.caption;
+                        img.className = 'details-image';
+
+                        const caption = document.createElement('p');
+                        caption.className = 'image-caption';
+                        caption.textContent = image.caption;
+
+                        imageWrapper.appendChild(img);
+                        imageWrapper.appendChild(caption);
+                        imagesContainer.appendChild(imageWrapper);
+                    });
+
+                    holeDetails.classList.add('active');
+                }
+            });
+        });
+
+        // Close hole details
+        closeBtn.addEventListener('click', () => {
+            holeDetails.classList.remove('active');
+        });
+
+        // Close hole details when clicking outside the content
+        holeDetails.addEventListener('click', (e) => {
+            if (e.target === holeDetails) {
+                holeDetails.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+
+</html>
