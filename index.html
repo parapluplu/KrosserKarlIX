@@ -228,6 +228,31 @@
             position: relative;
         }
 
+        .details-content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1100px;
+            /* Adjust to fit buttons */
+            margin: 0 auto;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            /* Changed for better visibility on dark overlay */
+            padding: 1rem;
+            --background-hover-opacity: 0;
+        }
+
+        .nav-btn ion-icon {
+            font-size: 3rem;
+            /* Make icons larger */
+        }
+
         .close-btn {
             position: absolute;
             top: 1rem;
@@ -248,7 +273,7 @@
 
         .details-image {
             width: 100%;
-            height: 200px;
+            height: 100%;
             object-fit: cover;
             border-radius: 6px;
         }
@@ -319,8 +344,33 @@
                 padding: 1.5rem;
                 margin: 1rem;
             }
+
+            .details-content-wrapper {
+                max-width: 100%;
+                position: relative;
+            }
+
+            .nav-btn {
+                position: absolute;
+                top: auto;
+                bottom: 1rem;
+                transform: translateY(0);
+                color: var(--text-dark);
+                /* Revert color for mobile view */
+            }
+
+            .nav-btn.prev-btn {
+                left: 1rem;
+            }
+
+            .nav-btn.next-btn {
+                right: 1rem;
+            }
+        }
         }
     </style>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
 </head>
 
 <body>
@@ -357,25 +407,36 @@
 
     <!-- Hole Details Modal -->
     <div class="hole-details" id="hole-details">
-        <div class="details-content">
-            <button class="close-btn">&times;</button>
-            <div class="hole-header">
-                <span class="hole-number" id="detail-hole-number">Bahn 1</span>
-                <h2 class="hole-title" id="detail-hole-title">Balls on Fire</h2>
+        <div class="details-content-wrapper">
+            <button class="nav-btn prev-btn button-tertiary" id="prev-hole-btn">
+                <ion-icon name="arrow-back-circle-outline" size="large"></ion-icon>
+            </button>
+            <div class="details-content">
+                <button class="close-btn">&times;</button>
+                <div class="hole-header">
+                    <span class="hole-number" id="detail-hole-number">
+                        <!-- Description will be inserted here by JavaScript -->
+                    </span>
+                    <h2 class="hole-title" id="detail-hole-title">
+                        <!-- Description will be inserted here by JavaScript -->
+                    </h2>
+                </div>
+                <p class="hole-description" id="detail-hole-description">
+                    <!-- Description will be inserted here by JavaScript -->
+                </p>
+                <div class="details-images" id="detail-images">
+                    <!-- Images will be inserted here by JavaScript -->
+                </div>
             </div>
-            <p class="hole-description" id="detail-hole-description">
-                <!-- Description will be inserted here by JavaScript -->
-            </p>
-            <div class="details-images" id="detail-images">
-                <!-- Images will be inserted here by JavaScript -->
-            </div>
+            <button class="nav-btn next-btn button-tertiary" id="next-hole-btn">
+                <ion-icon name="arrow-forward-circle-outline" size="large"></ion-icon>
+            </button>
         </div>
     </div>
 
     <footer>
         <div class="container">
-            <p>CrossGolf Tournament Road Book &copy; 2023</p>
-            <p>Alle Bahnendetails können je nach Wetterbedingungen Änderungen unterliegen</p>
+            <p>Krosser Karl IX &copy; 2025</p>
         </div>
     </footer>
 
@@ -392,7 +453,7 @@
             },
             2: {
                 title: "Rampensau",
-                description: "Spielmodus: Sramble\n\nVon der Rampe muss der Ball die Straße hoch gespielt werden. Hinter der rechten Halle ist ein Streusalzbehälter. Dieser muss getroffen werden. Bleibt er Ball drin liegen -1",
+                description: "Spielmodus: Scramble\n\nVon der Rampe muss der Ball die Straße hoch gespielt werden. Hinter der rechten Halle ist ein Streusalzbehälter. Dieser muss getroffen werden. Bleibt er Ball drin liegen -1",
                 images: [
                     { src: "img/bahn02_start.jpg", caption: "Abschlag" },
                     { src: "img/bahn02_ziel.jpg", caption: "Ziel" }
@@ -517,7 +578,7 @@
 
             holeCard.innerHTML = `
                 <div class="hole-header">
-                    <span class="hole-number">Bahn ${holeNumber}</span>
+                    <span class="hole-number">${holeNumber}</span>
                     <h3 class="hole-title">${hole.title}</h3>
                 </div>
                 <div class="hole-content">
@@ -537,42 +598,51 @@
         // Hole details functionality
         const holeCards = document.querySelectorAll('.hole-card');
         const holeDetails = document.getElementById('hole-details');
-        const closeBtn = document.querySelector('.close-btn');
+        const closeBtn = document.querySelector('.close-btn'); const prevBtn = document.getElementById('prev-hole-btn');
+        const nextBtn = document.getElementById('next-hole-btn');
+
+        let currentHoleNumber = 0;
+        const holeNumbers = Object.keys(holeData).map(Number);
+
+        function showHoleDetails(holeNumber) {
+            const hole = holeData[holeNumber];
+            if (!hole) return;
+
+            currentHoleNumber = Number(holeNumber);
+
+            document.getElementById('detail-hole-number').textContent = `Bahn ${holeNumber}`;
+            document.getElementById('detail-hole-title').textContent = hole.title;
+            document.getElementById('detail-hole-description').textContent = hole.description;
+
+            const imagesContainer = document.getElementById('detail-images');
+            imagesContainer.innerHTML = '';
+
+            hole.images.forEach(image => {
+                const imageWrapper = document.createElement('div');
+                imageWrapper.className = 'image-wrapper';
+
+                const img = document.createElement('img');
+                img.src = image.src;
+                img.alt = image.caption;
+                img.className = 'details-image';
+
+                const caption = document.createElement('p');
+                caption.className = 'image-caption';
+                caption.textContent = image.caption;
+
+                imageWrapper.appendChild(img);
+                imageWrapper.appendChild(caption);
+                imagesContainer.appendChild(imageWrapper);
+            });
+
+            holeDetails.classList.add('active');
+        }
 
         // Open hole details when a hole card is clicked
         holeCards.forEach(card => {
             card.addEventListener('click', () => {
                 const holeNumber = card.getAttribute('data-hole');
-                const hole = holeData[holeNumber];
-
-                if (hole) {
-                    document.getElementById('detail-hole-number').textContent = `Bahn ${holeNumber}`;
-                    document.getElementById('detail-hole-title').textContent = hole.title;
-                    document.getElementById('detail-hole-description').textContent = hole.description;
-
-                    const imagesContainer = document.getElementById('detail-images');
-                    imagesContainer.innerHTML = '';
-
-                    hole.images.forEach(image => {
-                        const imageWrapper = document.createElement('div');
-                        imageWrapper.className = 'image-wrapper';
-
-                        const img = document.createElement('img');
-                        img.src = image.src;
-                        img.alt = image.caption;
-                        img.className = 'details-image';
-
-                        const caption = document.createElement('p');
-                        caption.className = 'image-caption';
-                        caption.textContent = image.caption;
-
-                        imageWrapper.appendChild(img);
-                        imageWrapper.appendChild(caption);
-                        imagesContainer.appendChild(imageWrapper);
-                    });
-
-                    holeDetails.classList.add('active');
-                }
+                showHoleDetails(holeNumber);
             });
         });
 
@@ -586,6 +656,27 @@
             if (e.target === holeDetails) {
                 holeDetails.classList.remove('active');
             }
+        });
+
+        // Close hole details on escape key press
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                holeDetails.classList.remove('active');
+            }
+        });
+
+        // Navigate to previous hole
+        prevBtn.addEventListener('click', () => {
+            const currentIndex = holeNumbers.indexOf(currentHoleNumber);
+            const prevIndex = (currentIndex - 1 + holeNumbers.length) % holeNumbers.length;
+            showHoleDetails(holeNumbers[prevIndex]);
+        });
+
+        // Navigate to next hole
+        nextBtn.addEventListener('click', () => {
+            const currentIndex = holeNumbers.indexOf(currentHoleNumber);
+            const nextIndex = (currentIndex + 1) % holeNumbers.length;
+            showHoleDetails(holeNumbers[nextIndex]);
         });
     </script>
 </body>
